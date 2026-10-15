@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f6f8" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101820" />
+  <link rel="icon" href="data:," />
+  <title>Bible Reading Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-2: #e9eef2;
+      --ink: #17232d;
+      --muted: #536473;
+      --line: #cbd5dc;
+      --accent: #9c3e25;
+      --accent-soft: #f3dfd8;
+      --focus: #1d6b83;
+      --shadow: 0 16px 44px rgba(17, 34, 47, .08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101820;
+        --surface: #17232d;
+        --surface-2: #1f303c;
+        --ink: #f2f5f6;
+        --muted: #bdc9d0;
+        --line: #38505f;
+        --accent: #e98a6d;
+        --accent-soft: #3c2826;
+        --focus: #72bfd4;
+        --shadow: 0 18px 52px rgba(0, 0, 0, .24);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+    body {
+      margin: 0;
+      min-width: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    .page { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 80px; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, .55fr);
+      gap: 42px;
+      align-items: end;
+      padding: 18px 0 36px;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero h1 {
+      font-family: "Libre Baskerville", serif;
+      font-size: clamp(2.35rem, 6vw, 5rem);
+      line-height: .99;
+      letter-spacing: -.045em;
+      margin: 0;
+      max-width: 820px;
+    }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero-copy { margin: 0 0 5px; color: var(--muted); font-size: 1.04rem; line-height: 1.65; max-width: 34ch; }
+    .summary { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 26px; color: var(--muted); }
+    .summary strong { color: var(--ink); font-weight: 600; }
+    .tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 22px 0 18px;
+    }
+    .field { display: flex; align-items: center; gap: 8px; padding: 7px 8px 7px 14px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 6px 18px rgba(17,34,47,.035); }
+    .field label { font-weight: 600; white-space: nowrap; }
+    .field input { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); padding: 9px 5px; }
+    .field input::placeholder { color: var(--muted); opacity: .75; }
+    .field button { border: 0; background: var(--ink); color: var(--surface); padding: 10px 16px; cursor: pointer; font-weight: 600; }
+    .field button:hover { background: var(--accent); color: #fff; }
+    .field:focus-within { outline: 3px solid color-mix(in srgb, var(--focus) 28%, transparent); border-color: var(--focus); }
+    .jump-field input { max-width: 90px; }
+    .status { min-height: 24px; margin: 0 0 18px; color: var(--muted); font-size: .92rem; }
+    .part-nav {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 7px;
+      margin: 0 0 34px;
+    }
+    .part-nav a {
+      text-decoration: none;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 10px 7px 9px;
+      text-align: center;
+      transition: border-color .16s ease, background .16s ease;
+    }
+    .part-nav a:hover, .part-nav a:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
+    .part-nav span { display: block; font-weight: 600; }
+    .part-nav small { display: block; margin-top: 2px; color: var(--muted); font-size: .69rem; }
+    .plan { display: grid; gap: 28px; }
+    .plan-section { background: var(--surface); box-shadow: var(--shadow); }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      padding: 24px 28px 20px;
+      border-top: 4px solid var(--accent);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-index { color: var(--accent); font-size: .76rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 7px; }
+    .section-head h2 { font-family: "Libre Baskerville", serif; font-size: 1.7rem; letter-spacing: -.025em; margin: 0; }
+    .book-span { margin: 0; color: var(--muted); text-align: right; }
+    .reading-columns { display: grid; grid-template-columns: 1fr 1fr; }
+    .reading-columns ol { list-style: none; margin: 0; padding: 0; }
+    .reading-columns ol + ol { border-left: 1px solid var(--line); }
+    .reading-row {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr);
+      align-items: baseline;
+      min-height: 52px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      break-inside: avoid;
+    }
+    .reading-columns ol .reading-row:last-child { border-bottom: 0; }
+    .reading-row:hover { background: var(--surface-2); }
+    .day-number { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+    .day-label { font-size: .72rem; color: var(--muted); font-weight: 500; margin-right: 2px; }
+    .reading-text { line-height: 1.45; }
+    .reading-row.is-hit { background: var(--accent-soft); outline: 2px solid var(--accent); outline-offset: -2px; }
+    .reading-row[hidden], .plan-section[hidden] { display: none; }
+    .empty { display: none; background: var(--surface); border: 1px solid var(--line); padding: 30px; text-align: center; color: var(--muted); }
+    .empty.show { display: block; }
+    .footer-note { margin: 34px auto 0; max-width: 680px; text-align: center; color: var(--muted); line-height: 1.6; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+    @media (max-width: 760px) {
+      .page { width: min(100% - 22px, 620px); padding-top: 24px; }
+      .hero { grid-template-columns: 1fr; gap: 18px; padding-bottom: 26px; }
+      .hero h1 { font-size: clamp(2.35rem, 13vw, 4rem); }
+      .hero-copy { max-width: 48ch; }
+      .tools { grid-template-columns: 1fr; }
+      .part-nav { grid-template-columns: repeat(4, 1fr); }
+      .reading-columns { grid-template-columns: 1fr; }
+      .reading-columns ol + ol { border-left: 0; border-top: 1px solid var(--line); }
+      .reading-columns ol:first-child .reading-row:last-child { border-bottom: 0; }
+      .reading-columns ol + ol .reading-row:first-child { border-top: 0; }
+      .section-head { align-items: start; padding: 20px 18px 17px; }
+      .book-span { max-width: 45%; font-size: .88rem; }
+      .reading-row { grid-template-columns: 68px minmax(0, 1fr); padding: 13px 16px; }
+    }
+    @media (max-width: 390px) {
+      .field { flex-wrap: wrap; }
+      .field label { width: 100%; padding-top: 4px; }
+      .field button { margin-left: auto; }
+      .jump-field input { max-width: none; }
+      .section-head { display: block; }
+      .book-span { max-width: none; text-align: left; margin-top: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+    @media print {
+      @page { margin: .55in; }
+      body { background: #fff; color: #000; font-size: 9pt; }
+      .page { width: 100%; padding: 0; }
+      .hero { grid-template-columns: 1fr; padding: 0 0 12px; }
+      .hero h1 { font-size: 24pt; }
+      .hero-copy { color: #333; }
+      .tools, .part-nav, .status, .footer-note { display: none !important; }
+      .plan { gap: 12px; }
+      .plan-section { box-shadow: none; break-before: page; }
+      .plan-section:first-child { break-before: auto; }
+      .section-head { padding: 8px 10px; border-top: 2px solid #000; }
+      .reading-row { min-height: 0; padding: 4px 8px; grid-template-columns: 52px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="top">
+    <header class="hero">
+      <div>
+        <h1>One year, <em>straight through.</em></h1>
+        <div class="summary" aria-label="Plan summary">
+          <span><strong>365</strong> days</span>
+          <span><strong>1,189</strong> chapters</span>
+          <span><strong>66</strong> books</span>
+        </div>
+      </div>
+      <p class="hero-copy">Read the Bible in canonical order, from Genesis to Revelation. Most days are three chapters; some are four. Begin whenever you’re ready.</p>
+    </header>
+
+    <div class="tools" aria-label="Find a reading">
+      <form class="field jump-field" id="jump-form">
+        <label for="day-input">Jump to day</label>
+        <input id="day-input" type="number" min="1" max="365" inputmode="numeric" placeholder="1–365" />
+        <button type="submit">Go</button>
+      </form>
+      <div class="field">
+        <label for="book-search">Find a book</label>
+        <input id="book-search" type="search" autocomplete="off" placeholder="Try Romans or Psalms" />
+        <button type="button" id="clear-search">Clear</button>
+      </div>
+    </div>
+    <p class="status" id="status" aria-live="polite">Choose a part, jump to a day, or search for a book.</p>
+
+    <nav class="part-nav" aria-label="Plan parts"><a href="#part-1" aria-label="Go to part 1, days 1 to 31"><span>01</span><small>1–31</small></a><a href="#part-2" aria-label="Go to part 2, days 32 to 59"><span>02</span><small>32–59</small></a><a href="#part-3" aria-label="Go to part 3, days 60 to 90"><span>03</span><small>60–90</small></a><a href="#part-4" aria-label="Go to part 4, days 91 to 120"><span>04</span><small>91–120</small></a><a href="#part-5" aria-label="Go to part 5, days 121 to 151"><span>05</span><small>121–151</small></a><a href="#part-6" aria-label="Go to part 6, days 152 to 181"><span>06</span><small>152–181</small></a><a href="#part-7" aria-label="Go to part 7, days 182 to 212"><span>07</span><small>182–212</small></a><a href="#part-8" aria-label="Go to part 8, days 213 to 243"><span>08</span><small>213–243</small></a><a href="#part-9" aria-label="Go to part 9, days 244 to 273"><span>09</span><small>244–273</small></a><a href="#part-10" aria-label="Go to part 10, days 274 to 304"><span>10</span><small>274–304</small></a><a href="#part-11" aria-label="Go to part 11, days 305 to 334"><span>11</span><small>305–334</small></a><a href="#part-12" aria-label="Go to part 12, days 335 to 365"><span>12</span><small>335–365</small></a></nav>
+
+    <div class="plan" id="plan"><section class="plan-section" id="part-1" data-part="1">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 01</p>
+      <h2>Days 1–31</h2>
+    </div>
+    <p class="book-span">Genesis → Leviticus</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-1" data-search="genesis 1–3 1">
+      <span class="day-number"><span class="day-label">Day</span> 1</span>
+      <span class="reading-text">Genesis 1–3</span>
+    </li><li class="reading-row" id="day-2" data-search="genesis 4–6 2">
+      <span class="day-number"><span class="day-label">Day</span> 2</span>
+      <span class="reading-text">Genesis 4–6</span>
+    </li><li class="reading-row" id="day-3" data-search="genesis 7–9 3">
+      <span class="day-number"><span class="day-label">Day</span> 3</span>
+      <span class="reading-text">Genesis 7–9</span>
+    </li><li class="reading-row" id="day-4" data-search="genesis 10–13 4">
+      <span class="day-number"><span class="day-label">Day</span> 4</span>
+      <span class="reading-text">Genesis 10–13</span>
+    </li><li class="reading-row" id="day-5" data-search="genesis 14–16 5">
+      <span class="day-number"><span class="day-label">Day</span> 5</span>
+      <span class="reading-text">Genesis 14–16</span>
+    </li><li class="reading-row" id="day-6" data-search="genesis 17–19 6">
+      <span class="day-number"><span class="day-label">Day</span> 6</span>
+      <span class="reading-text">Genesis 17–19</span>
+    </li><li class="reading-row" id="day-7" data-search="genesis 20–22 7">
+      <span class="day-number"><span class="day-label">Day</span> 7</span>
+      <span class="reading-text">Genesis 20–22</span>
+    </li><li class="reading-row" id="day-8" data-search="genesis 23–26 8">
+      <span class="day-number"><span class="day-label">Day</span> 8</span>
+      <span class="reading-text">Genesis 23–26</span>
+    </li><li class="reading-row" id="day-9" data-search="genesis 27–29 9">
+      <span class="day-number"><span class="day-label">Day</span> 9</span>
+      <span class="reading-text">Genesis 27–29</span>
+    </li><li class="reading-row" id="day-10" data-search="genesis 30–32 10">
+      <span class="day-number"><span class="day-label">Day</span> 10</span>
+      <span class="reading-text">Genesis 30–32</span>
+    </li><li class="reading-row" id="day-11" data-search="genesis 33–35 11">
+      <span class="day-number"><span class="day-label">Day</span> 11</span>
+      <span class="reading-text">Genesis 33–35</span>
+    </li><li class="reading-row" id="day-12" data-search="genesis 36–39 12">
+      <span class="day-number"><span class="day-label">Day</span> 12</span>
+      <span class="reading-text">Genesis 36–39</span>
+    </li><li class="reading-row" id="day-13" data-search="genesis 40–42 13">
+      <span class="day-number"><span class="day-label">Day</span> 13</span>
+      <span class="reading-text">Genesis 40–42</span>
+    </li><li class="reading-row" id="day-14" data-search="genesis 43–45 14">
+      <span class="day-number"><span class="day-label">Day</span> 14</span>
+      <span class="reading-text">Genesis 43–45</span>
+    </li><li class="reading-row" id="day-15" data-search="genesis 46–48 15">
+      <span class="day-number"><span class="day-label">Day</span> 15</span>
+      <span class="reading-text">Genesis 46–48</span>
+    </li><li class="reading-row" id="day-16" data-search="genesis 49–50 · exodus 1–2 16">
+      <span class="day-number"><span class="day-label">Day</span> 16</span>
+      <span class="reading-text">Genesis 49–50 · Exodus 1–2</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-17" data-search="exodus 3–5 17">
+      <span class="day-number"><span class="day-label">Day</span> 17</span>
+      <span class="reading-text">Exodus 3–5</span>
+    </li><li class="reading-row" id="day-18" data-search="exodus 6–8 18">
+      <span class="day-number"><span class="day-label">Day</span> 18</span>
+      <span class="reading-text">Exodus 6–8</span>
+    </li><li class="reading-row" id="day-19" data-search="exodus 9–11 19">
+      <span class="day-number"><span class="day-label">Day</span> 19</span>
+      <span class="reading-text">Exodus 9–11</span>
+    </li><li class="reading-row" id="day-20" data-search="exodus 12–15 20">
+      <span class="day-number"><span class="day-label">Day</span> 20</span>
+      <span class="reading-text">Exodus 12–15</span>
+    </li><li class="reading-row" id="day-21" data-search="exodus 16–18 21">
+      <span class="day-number"><span class="day-label">Day</span> 21</span>
+      <span class="reading-text">Exodus 16–18</span>
+    </li><li class="reading-row" id="day-22" data-search="exodus 19–21 22">
+      <span class="day-number"><span class="day-label">Day</span> 22</span>
+      <span class="reading-text">Exodus 19–21</span>
+    </li><li class="reading-row" id="day-23" data-search="exodus 22–24 23">
+      <span class="day-number"><span class="day-label">Day</span> 23</span>
+      <span class="reading-text">Exodus 22–24</span>
+    </li><li class="reading-row" id="day-24" data-search="exodus 25–28 24">
+      <span class="day-number"><span class="day-label">Day</span> 24</span>
+      <span class="reading-text">Exodus 25–28</span>
+    </li><li class="reading-row" id="day-25" data-search="exodus 29–31 25">
+      <span class="day-number"><span class="day-label">Day</span> 25</span>
+      <span class="reading-text">Exodus 29–31</span>
+    </li><li class="reading-row" id="day-26" data-search="exodus 32–34 26">
+      <span class="day-number"><span class="day-label">Day</span> 26</span>
+      <span class="reading-text">Exodus 32–34</span>
+    </li><li class="reading-row" id="day-27" data-search="exodus 35–37 27">
+      <span class="day-number"><span class="day-label">Day</span> 27</span>
+      <span class="reading-text">Exodus 35–37</span>
+    </li><li class="reading-row" id="day-28" data-search="exodus 38–40 · leviticus 1 28">
+      <span class="day-number"><span class="day-label">Day</span> 28</span>
+      <span class="reading-text">Exodus 38–40 · Leviticus 1</span>
+    </li><li class="reading-row" id="day-29" data-search="leviticus 2–4 29">
+      <span class="day-number"><span class="day-label">Day</span> 29</span>
+      <span class="reading-text">Leviticus 2–4</span>
+    </li><li class="reading-row" id="day-30" data-search="leviticus 5–7 30">
+      <span class="day-number"><span class="day-label">Day</span> 30</span>
+      <span class="reading-text">Leviticus 5–7</span>
+    </li><li class="reading-row" id="day-31" data-search="leviticus 8–10 31">
+      <span class="day-number"><span class="day-label">Day</span> 31</span>
+      <span class="reading-text">Leviticus 8–10</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-2" data-part="2">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 02</p>
+      <h2>Days 32–59</h2>
+    </div>
+    <p class="book-span">Leviticus → Joshua</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-32" data-search="leviticus 11–14 32">
+      <span class="day-number"><span class="day-label">Day</span> 32</span>
+      <span class="reading-text">Leviticus 11–14</span>
+    </li><li class="reading-row" id="day-33" data-search="leviticus 15–17 33">
+      <span class="day-number"><span class="day-label">Day</span> 33</span>
+      <span class="reading-text">Leviticus 15–17</span>
+    </li><li class="reading-row" id="day-34" data-search="leviticus 18–20 34">
+      <span class="day-number"><span class="day-label">Day</span> 34</span>
+      <span class="reading-text">Leviticus 18–20</span>
+    </li><li class="reading-row" id="day-35" data-search="leviticus 21–24 35">
+      <span class="day-number"><span class="day-label">Day</span> 35</span>
+      <span class="reading-text">Leviticus 21–24</span>
+    </li><li class="reading-row" id="day-36" data-search="leviticus 25–27 36">
+      <span class="day-number"><span class="day-label">Day</span> 36</span>
+      <span class="reading-text">Leviticus 25–27</span>
+    </li><li class="reading-row" id="day-37" data-search="numbers 1–3 37">
+      <span class="day-number"><span class="day-label">Day</span> 37</span>
+      <span class="reading-text">Numbers 1–3</span>
+    </li><li class="reading-row" id="day-38" data-search="numbers 4–6 38">
+      <span class="day-number"><span class="day-label">Day</span> 38</span>
+      <span class="reading-text">Numbers 4–6</span>
+    </li><li class="reading-row" id="day-39" data-search="numbers 7–10 39">
+      <span class="day-number"><span class="day-label">Day</span> 39</span>
+      <span class="reading-text">Numbers 7–10</span>
+    </li><li class="reading-row" id="day-40" data-search="numbers 11–13 40">
+      <span class="day-number"><span class="day-label">Day</span> 40</span>
+      <span class="reading-text">Numbers 11–13</span>
+    </li><li class="reading-row" id="day-41" data-search="numbers 14–16 41">
+      <span class="day-number"><span class="day-label">Day</span> 41</span>
+      <span class="reading-text">Numbers 14–16</span>
+    </li><li class="reading-row" id="day-42" data-search="numbers 17–19 42">
+      <span class="day-number"><span class="day-label">Day</span> 42</span>
+      <span class="reading-text">Numbers 17–19</span>
+    </li><li class="reading-row" id="day-43" data-search="numbers 20–23 43">
+      <span class="day-number"><span class="day-label">Day</span> 43</span>
+      <span class="reading-text">Numbers 20–23</span>
+    </li><li class="reading-row" id="day-44" data-search="numbers 24–26 44">
+      <span class="day-number"><span class="day-label">Day</span> 44</span>
+      <span class="reading-text">Numbers 24–26</span>
+    </li><li class="reading-row" id="day-45" data-search="numbers 27–29 45">
+      <span class="day-number"><span class="day-label">Day</span> 45</span>
+      <span class="reading-text">Numbers 27–29</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-46" data-search="numbers 30–32 46">
+      <span class="day-number"><span class="day-label">Day</span> 46</span>
+      <span class="reading-text">Numbers 30–32</span>
+    </li><li class="reading-row" id="day-47" data-search="numbers 33–36 47">
+      <span class="day-number"><span class="day-label">Day</span> 47</span>
+      <span class="reading-text">Numbers 33–36</span>
+    </li><li class="reading-row" id="day-48" data-search="deuteronomy 1–3 48">
+      <span class="day-number"><span class="day-label">Day</span> 48</span>
+      <span class="reading-text">Deuteronomy 1–3</span>
+    </li><li class="reading-row" id="day-49" data-search="deuteronomy 4–6 49">
+      <span class="day-number"><span class="day-label">Day</span> 49</span>
+      <span class="reading-text">Deuteronomy 4–6</span>
+    </li><li class="reading-row" id="day-50" data-search="deuteronomy 7–9 50">
+      <span class="day-number"><span class="day-label">Day</span> 50</span>
+      <span class="reading-text">Deuteronomy 7–9</span>
+    </li><li class="reading-row" id="day-51" data-search="deuteronomy 10–13 51">
+      <span class="day-number"><span class="day-label">Day</span> 51</span>
+      <span class="reading-text">Deuteronomy 10–13</span>
+    </li><li class="reading-row" id="day-52" data-search="deuteronomy 14–16 52">
+      <span class="day-number"><span class="day-label">Day</span> 52</span>
+      <span class="reading-text">Deuteronomy 14–16</span>
+    </li><li class="reading-row" id="day-53" data-search="deuteronomy 17–19 53">
+      <span class="day-number"><span class="day-label">Day</span> 53</span>
+      <span class="reading-text">Deuteronomy 17–19</span>
+    </li><li class="reading-row" id="day-54" data-search="deuteronomy 20–22 54">
+      <span class="day-number"><span class="day-label">Day</span> 54</span>
+      <span class="reading-text">Deuteronomy 20–22</span>
+    </li><li class="reading-row" id="day-55" data-search="deuteronomy 23–26 55">
+      <span class="day-number"><span class="day-label">Day</span> 55</span>
+      <span class="reading-text">Deuteronomy 23–26</span>
+    </li><li class="reading-row" id="day-56" data-search="deuteronomy 27–29 56">
+      <span class="day-number"><span class="day-label">Day</span> 56</span>
+      <span class="reading-text">Deuteronomy 27–29</span>
+    </li><li class="reading-row" id="day-57" data-search="deuteronomy 30–32 57">
+      <span class="day-number"><span class="day-label">Day</span> 57</span>
+      <span class="reading-text">Deuteronomy 30–32</span>
+    </li><li class="reading-row" id="day-58" data-search="deuteronomy 33–34 · joshua 1 58">
+      <span class="day-number"><span class="day-label">Day</span> 58</span>
+      <span class="reading-text">Deuteronomy 33–34 · Joshua 1</span>
+    </li><li class="reading-row" id="day-59" data-search="joshua 2–5 59">
+      <span class="day-number"><span class="day-label">Day</span> 59</span>
+      <span class="reading-text">Joshua 2–5</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-3" data-part="3">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 03</p>
+      <h2>Days 60–90</h2>
+    </div>
+    <p class="book-span">Joshua → 1 Kings</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-60" data-search="joshua 6–8 60">
+      <span class="day-number"><span class="day-label">Day</span> 60</span>
+      <span class="reading-text">Joshua 6–8</span>
+    </li><li class="reading-row" id="day-61" data-search="joshua 9–11 61">
+      <span class="day-number"><span class="day-label">Day</span> 61</span>
+      <span class="reading-text">Joshua 9–11</span>
+    </li><li class="reading-row" id="day-62" data-search="joshua 12–14 62">
+      <span class="day-number"><span class="day-label">Day</span> 62</span>
+      <span class="reading-text">Joshua 12–14</span>
+    </li><li class="reading-row" id="day-63" data-search="joshua 15–18 63">
+      <span class="day-number"><span class="day-label">Day</span> 63</span>
+      <span class="reading-text">Joshua 15–18</span>
+    </li><li class="reading-row" id="day-64" data-search="joshua 19–21 64">
+      <span class="day-number"><span class="day-label">Day</span> 64</span>
+      <span class="reading-text">Joshua 19–21</span>
+    </li><li class="reading-row" id="day-65" data-search="joshua 22–24 65">
+      <span class="day-number"><span class="day-label">Day</span> 65</span>
+      <span class="reading-text">Joshua 22–24</span>
+    </li><li class="reading-row" id="day-66" data-search="judges 1–3 66">
+      <span class="day-number"><span class="day-label">Day</span> 66</span>
+      <span class="reading-text">Judges 1–3</span>
+    </li><li class="reading-row" id="day-67" data-search="judges 4–7 67">
+      <span class="day-number"><span class="day-label">Day</span> 67</span>
+      <span class="reading-text">Judges 4–7</span>
+    </li><li class="reading-row" id="day-68" data-search="judges 8–10 68">
+      <span class="day-number"><span class="day-label">Day</span> 68</span>
+      <span class="reading-text">Judges 8–10</span>
+    </li><li class="reading-row" id="day-69" data-search="judges 11–13 69">
+      <span class="day-number"><span class="day-label">Day</span> 69</span>
+      <span class="reading-text">Judges 11–13</span>
+    </li><li class="reading-row" id="day-70" data-search="judges 14–17 70">
+      <span class="day-number"><span class="day-label">Day</span> 70</span>
+      <span class="reading-text">Judges 14–17</span>
+    </li><li class="reading-row" id="day-71" data-search="judges 18–20 71">
+      <span class="day-number"><span class="day-label">Day</span> 71</span>
+      <span class="reading-text">Judges 18–20</span>
+    </li><li class="reading-row" id="day-72" data-search="judges 21 · ruth 1–2 72">
+      <span class="day-number"><span class="day-label">Day</span> 72</span>
+      <span class="reading-text">Judges 21 · Ruth 1–2</span>
+    </li><li class="reading-row" id="day-73" data-search="ruth 3–4 · 1 samuel 1 73">
+      <span class="day-number"><span class="day-label">Day</span> 73</span>
+      <span class="reading-text">Ruth 3–4 · 1 Samuel 1</span>
+    </li><li class="reading-row" id="day-74" data-search="1 samuel 2–5 74">
+      <span class="day-number"><span class="day-label">Day</span> 74</span>
+      <span class="reading-text">1 Samuel 2–5</span>
+    </li><li class="reading-row" id="day-75" data-search="1 samuel 6–8 75">
+      <span class="day-number"><span class="day-label">Day</span> 75</span>
+      <span class="reading-text">1 Samuel 6–8</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-76" data-search="1 samuel 9–11 76">
+      <span class="day-number"><span class="day-label">Day</span> 76</span>
+      <span class="reading-text">1 Samuel 9–11</span>
+    </li><li class="reading-row" id="day-77" data-search="1 samuel 12–14 77">
+      <span class="day-number"><span class="day-label">Day</span> 77</span>
+      <span class="reading-text">1 Samuel 12–14</span>
+    </li><li class="reading-row" id="day-78" data-search="1 samuel 15–18 78">
+      <span class="day-number"><span class="day-label">Day</span> 78</span>
+      <span class="reading-text">1 Samuel 15–18</span>
+    </li><li class="reading-row" id="day-79" data-search="1 samuel 19–21 79">
+      <span class="day-number"><span class="day-label">Day</span> 79</span>
+      <span class="reading-text">1 Samuel 19–21</span>
+    </li><li class="reading-row" id="day-80" data-search="1 samuel 22–24 80">
+      <span class="day-number"><span class="day-label">Day</span> 80</span>
+      <span class="reading-text">1 Samuel 22–24</span>
+    </li><li class="reading-row" id="day-81" data-search="1 samuel 25–27 81">
+      <span class="day-number"><span class="day-label">Day</span> 81</span>
+      <span class="reading-text">1 Samuel 25–27</span>
+    </li><li class="reading-row" id="day-82" data-search="1 samuel 28–31 82">
+      <span class="day-number"><span class="day-label">Day</span> 82</span>
+      <span class="reading-text">1 Samuel 28–31</span>
+    </li><li class="reading-row" id="day-83" data-search="2 samuel 1–3 83">
+      <span class="day-number"><span class="day-label">Day</span> 83</span>
+      <span class="reading-text">2 Samuel 1–3</span>
+    </li><li class="reading-row" id="day-84" data-search="2 samuel 4–6 84">
+      <span class="day-number"><span class="day-label">Day</span> 84</span>
+      <span class="reading-text">2 Samuel 4–6</span>
+    </li><li class="reading-row" id="day-85" data-search="2 samuel 7–9 85">
+      <span class="day-number"><span class="day-label">Day</span> 85</span>
+      <span class="reading-text">2 Samuel 7–9</span>
+    </li><li class="reading-row" id="day-86" data-search="2 samuel 10–13 86">
+      <span class="day-number"><span class="day-label">Day</span> 86</span>
+      <span class="reading-text">2 Samuel 10–13</span>
+    </li><li class="reading-row" id="day-87" data-search="2 samuel 14–16 87">
+      <span class="day-number"><span class="day-label">Day</span> 87</span>
+      <span class="reading-text">2 Samuel 14–16</span>
+    </li><li class="reading-row" id="day-88" data-search="2 samuel 17–19 88">
+      <span class="day-number"><span class="day-label">Day</span> 88</span>
+      <span class="reading-text">2 Samuel 17–19</span>
+    </li><li class="reading-row" id="day-89" data-search="2 samuel 20–22 89">
+      <span class="day-number"><span class="day-label">Day</span> 89</span>
+      <span class="reading-text">2 Samuel 20–22</span>
+    </li><li class="reading-row" id="day-90" data-search="2 samuel 23–24 · 1 kings 1–2 90">
+      <span class="day-number"><span class="day-label">Day</span> 90</span>
+      <span class="reading-text">2 Samuel 23–24 · 1 Kings 1–2</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-4" data-part="4">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 04</p>
+      <h2>Days 91–120</h2>
+    </div>
+    <p class="book-span">1 Kings → 2 Chronicles</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-91" data-search="1 kings 3–5 91">
+      <span class="day-number"><span class="day-label">Day</span> 91</span>
+      <span class="reading-text">1 Kings 3–5</span>
+    </li><li class="reading-row" id="day-92" data-search="1 kings 6–8 92">
+      <span class="day-number"><span class="day-label">Day</span> 92</span>
+      <span class="reading-text">1 Kings 6–8</span>
+    </li><li class="reading-row" id="day-93" data-search="1 kings 9–11 93">
+      <span class="day-number"><span class="day-label">Day</span> 93</span>
+      <span class="reading-text">1 Kings 9–11</span>
+    </li><li class="reading-row" id="day-94" data-search="1 kings 12–15 94">
+      <span class="day-number"><span class="day-label">Day</span> 94</span>
+      <span class="reading-text">1 Kings 12–15</span>
+    </li><li class="reading-row" id="day-95" data-search="1 kings 16–18 95">
+      <span class="day-number"><span class="day-label">Day</span> 95</span>
+      <span class="reading-text">1 Kings 16–18</span>
+    </li><li class="reading-row" id="day-96" data-search="1 kings 19–21 96">
+      <span class="day-number"><span class="day-label">Day</span> 96</span>
+      <span class="reading-text">1 Kings 19–21</span>
+    </li><li class="reading-row" id="day-97" data-search="1 kings 22 · 2 kings 1–2 97">
+      <span class="day-number"><span class="day-label">Day</span> 97</span>
+      <span class="reading-text">1 Kings 22 · 2 Kings 1–2</span>
+    </li><li class="reading-row" id="day-98" data-search="2 kings 3–6 98">
+      <span class="day-number"><span class="day-label">Day</span> 98</span>
+      <span class="reading-text">2 Kings 3–6</span>
+    </li><li class="reading-row" id="day-99" data-search="2 kings 7–9 99">
+      <span class="day-number"><span class="day-label">Day</span> 99</span>
+      <span class="reading-text">2 Kings 7–9</span>
+    </li><li class="reading-row" id="day-100" data-search="2 kings 10–12 100">
+      <span class="day-number"><span class="day-label">Day</span> 100</span>
+      <span class="reading-text">2 Kings 10–12</span>
+    </li><li class="reading-row" id="day-101" data-search="2 kings 13–16 101">
+      <span class="day-number"><span class="day-label">Day</span> 101</span>
+      <span class="reading-text">2 Kings 13–16</span>
+    </li><li class="reading-row" id="day-102" data-search="2 kings 17–19 102">
+      <span class="day-number"><span class="day-label">Day</span> 102</span>
+      <span class="reading-text">2 Kings 17–19</span>
+    </li><li class="reading-row" id="day-103" data-search="2 kings 20–22 103">
+      <span class="day-number"><span class="day-label">Day</span> 103</span>
+      <span class="reading-text">2 Kings 20–22</span>
+    </li><li class="reading-row" id="day-104" data-search="2 kings 23–25 104">
+      <span class="day-number"><span class="day-label">Day</span> 104</span>
+      <span class="reading-text">2 Kings 23–25</span>
+    </li><li class="reading-row" id="day-105" data-search="1 chronicles 1–4 105">
+      <span class="day-number"><span class="day-label">Day</span> 105</span>
+      <span class="reading-text">1 Chronicles 1–4</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-106" data-search="1 chronicles 5–7 106">
+      <span class="day-number"><span class="day-label">Day</span> 106</span>
+      <span class="reading-text">1 Chronicles 5–7</span>
+    </li><li class="reading-row" id="day-107" data-search="1 chronicles 8–10 107">
+      <span class="day-number"><span class="day-label">Day</span> 107</span>
+      <span class="reading-text">1 Chronicles 8–10</span>
+    </li><li class="reading-row" id="day-108" data-search="1 chronicles 11–13 108">
+      <span class="day-number"><span class="day-label">Day</span> 108</span>
+      <span class="reading-text">1 Chronicles 11–13</span>
+    </li><li class="reading-row" id="day-109" data-search="1 chronicles 14–17 109">
+      <span class="day-number"><span class="day-label">Day</span> 109</span>
+      <span class="reading-text">1 Chronicles 14–17</span>
+    </li><li class="reading-row" id="day-110" data-search="1 chronicles 18–20 110">
+      <span class="day-number"><span class="day-label">Day</span> 110</span>
+      <span class="reading-text">1 Chronicles 18–20</span>
+    </li><li class="reading-row" id="day-111" data-search="1 chronicles 21–23 111">
+      <span class="day-number"><span class="day-label">Day</span> 111</span>
+      <span class="reading-text">1 Chronicles 21–23</span>
+    </li><li class="reading-row" id="day-112" data-search="1 chronicles 24–26 112">
+      <span class="day-number"><span class="day-label">Day</span> 112</span>
+      <span class="reading-text">1 Chronicles 24–26</span>
+    </li><li class="reading-row" id="day-113" data-search="1 chronicles 27–29 · 2 chronicles 1 113">
+      <span class="day-number"><span class="day-label">Day</span> 113</span>
+      <span class="reading-text">1 Chronicles 27–29 · 2 Chronicles 1</span>
+    </li><li class="reading-row" id="day-114" data-search="2 chronicles 2–4 114">
+      <span class="day-number"><span class="day-label">Day</span> 114</span>
+      <span class="reading-text">2 Chronicles 2–4</span>
+    </li><li class="reading-row" id="day-115" data-search="2 chronicles 5–7 115">
+      <span class="day-number"><span class="day-label">Day</span> 115</span>
+      <span class="reading-text">2 Chronicles 5–7</span>
+    </li><li class="reading-row" id="day-116" data-search="2 chronicles 8–10 116">
+      <span class="day-number"><span class="day-label">Day</span> 116</span>
+      <span class="reading-text">2 Chronicles 8–10</span>
+    </li><li class="reading-row" id="day-117" data-search="2 chronicles 11–14 117">
+      <span class="day-number"><span class="day-label">Day</span> 117</span>
+      <span class="reading-text">2 Chronicles 11–14</span>
+    </li><li class="reading-row" id="day-118" data-search="2 chronicles 15–17 118">
+      <span class="day-number"><span class="day-label">Day</span> 118</span>
+      <span class="reading-text">2 Chronicles 15–17</span>
+    </li><li class="reading-row" id="day-119" data-search="2 chronicles 18–20 119">
+      <span class="day-number"><span class="day-label">Day</span> 119</span>
+      <span class="reading-text">2 Chronicles 18–20</span>
+    </li><li class="reading-row" id="day-120" data-search="2 chronicles 21–23 120">
+      <span class="day-number"><span class="day-label">Day</span> 120</span>
+      <span class="reading-text">2 Chronicles 21–23</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-5" data-part="5">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 05</p>
+      <h2>Days 121–151</h2>
+    </div>
+    <p class="book-span">2 Chronicles → Psalms</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-121" data-search="2 chronicles 24–27 121">
+      <span class="day-number"><span class="day-label">Day</span> 121</span>
+      <span class="reading-text">2 Chronicles 24–27</span>
+    </li><li class="reading-row" id="day-122" data-search="2 chronicles 28–30 122">
+      <span class="day-number"><span class="day-label">Day</span> 122</span>
+      <span class="reading-text">2 Chronicles 28–30</span>
+    </li><li class="reading-row" id="day-123" data-search="2 chronicles 31–33 123">
+      <span class="day-number"><span class="day-label">Day</span> 123</span>
+      <span class="reading-text">2 Chronicles 31–33</span>
+    </li><li class="reading-row" id="day-124" data-search="2 chronicles 34–36 124">
+      <span class="day-number"><span class="day-label">Day</span> 124</span>
+      <span class="reading-text">2 Chronicles 34–36</span>
+    </li><li class="reading-row" id="day-125" data-search="ezra 1–4 125">
+      <span class="day-number"><span class="day-label">Day</span> 125</span>
+      <span class="reading-text">Ezra 1–4</span>
+    </li><li class="reading-row" id="day-126" data-search="ezra 5–7 126">
+      <span class="day-number"><span class="day-label">Day</span> 126</span>
+      <span class="reading-text">Ezra 5–7</span>
+    </li><li class="reading-row" id="day-127" data-search="ezra 8–10 127">
+      <span class="day-number"><span class="day-label">Day</span> 127</span>
+      <span class="reading-text">Ezra 8–10</span>
+    </li><li class="reading-row" id="day-128" data-search="nehemiah 1–3 128">
+      <span class="day-number"><span class="day-label">Day</span> 128</span>
+      <span class="reading-text">Nehemiah 1–3</span>
+    </li><li class="reading-row" id="day-129" data-search="nehemiah 4–7 129">
+      <span class="day-number"><span class="day-label">Day</span> 129</span>
+      <span class="reading-text">Nehemiah 4–7</span>
+    </li><li class="reading-row" id="day-130" data-search="nehemiah 8–10 130">
+      <span class="day-number"><span class="day-label">Day</span> 130</span>
+      <span class="reading-text">Nehemiah 8–10</span>
+    </li><li class="reading-row" id="day-131" data-search="nehemiah 11–13 131">
+      <span class="day-number"><span class="day-label">Day</span> 131</span>
+      <span class="reading-text">Nehemiah 11–13</span>
+    </li><li class="reading-row" id="day-132" data-search="esther 1–3 132">
+      <span class="day-number"><span class="day-label">Day</span> 132</span>
+      <span class="reading-text">Esther 1–3</span>
+    </li><li class="reading-row" id="day-133" data-search="esther 4–7 133">
+      <span class="day-number"><span class="day-label">Day</span> 133</span>
+      <span class="reading-text">Esther 4–7</span>
+    </li><li class="reading-row" id="day-134" data-search="esther 8–10 134">
+      <span class="day-number"><span class="day-label">Day</span> 134</span>
+      <span class="reading-text">Esther 8–10</span>
+    </li><li class="reading-row" id="day-135" data-search="job 1–3 135">
+      <span class="day-number"><span class="day-label">Day</span> 135</span>
+      <span class="reading-text">Job 1–3</span>
+    </li><li class="reading-row" id="day-136" data-search="job 4–7 136">
+      <span class="day-number"><span class="day-label">Day</span> 136</span>
+      <span class="reading-text">Job 4–7</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-137" data-search="job 8–10 137">
+      <span class="day-number"><span class="day-label">Day</span> 137</span>
+      <span class="reading-text">Job 8–10</span>
+    </li><li class="reading-row" id="day-138" data-search="job 11–13 138">
+      <span class="day-number"><span class="day-label">Day</span> 138</span>
+      <span class="reading-text">Job 11–13</span>
+    </li><li class="reading-row" id="day-139" data-search="job 14–16 139">
+      <span class="day-number"><span class="day-label">Day</span> 139</span>
+      <span class="reading-text">Job 14–16</span>
+    </li><li class="reading-row" id="day-140" data-search="job 17–20 140">
+      <span class="day-number"><span class="day-label">Day</span> 140</span>
+      <span class="reading-text">Job 17–20</span>
+    </li><li class="reading-row" id="day-141" data-search="job 21–23 141">
+      <span class="day-number"><span class="day-label">Day</span> 141</span>
+      <span class="reading-text">Job 21–23</span>
+    </li><li class="reading-row" id="day-142" data-search="job 24–26 142">
+      <span class="day-number"><span class="day-label">Day</span> 142</span>
+      <span class="reading-text">Job 24–26</span>
+    </li><li class="reading-row" id="day-143" data-search="job 27–29 143">
+      <span class="day-number"><span class="day-label">Day</span> 143</span>
+      <span class="reading-text">Job 27–29</span>
+    </li><li class="reading-row" id="day-144" data-search="job 30–33 144">
+      <span class="day-number"><span class="day-label">Day</span> 144</span>
+      <span class="reading-text">Job 30–33</span>
+    </li><li class="reading-row" id="day-145" data-search="job 34–36 145">
+      <span class="day-number"><span class="day-label">Day</span> 145</span>
+      <span class="reading-text">Job 34–36</span>
+    </li><li class="reading-row" id="day-146" data-search="job 37–39 146">
+      <span class="day-number"><span class="day-label">Day</span> 146</span>
+      <span class="reading-text">Job 37–39</span>
+    </li><li class="reading-row" id="day-147" data-search="job 40–42 147">
+      <span class="day-number"><span class="day-label">Day</span> 147</span>
+      <span class="reading-text">Job 40–42</span>
+    </li><li class="reading-row" id="day-148" data-search="psalms 1–4 148">
+      <span class="day-number"><span class="day-label">Day</span> 148</span>
+      <span class="reading-text">Psalms 1–4</span>
+    </li><li class="reading-row" id="day-149" data-search="psalms 5–7 149">
+      <span class="day-number"><span class="day-label">Day</span> 149</span>
+      <span class="reading-text">Psalms 5–7</span>
+    </li><li class="reading-row" id="day-150" data-search="psalms 8–10 150">
+      <span class="day-number"><span class="day-label">Day</span> 150</span>
+      <span class="reading-text">Psalms 8–10</span>
+    </li><li class="reading-row" id="day-151" data-search="psalms 11–13 151">
+      <span class="day-number"><span class="day-label">Day</span> 151</span>
+      <span class="reading-text">Psalms 11–13</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-6" data-part="6">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 06</p>
+      <h2>Days 152–181</h2>
+    </div>
+    <p class="book-span">Psalms</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-152" data-search="psalms 14–17 152">
+      <span class="day-number"><span class="day-label">Day</span> 152</span>
+      <span class="reading-text">Psalms 14–17</span>
+    </li><li class="reading-row" id="day-153" data-search="psalms 18–20 153">
+      <span class="day-number"><span class="day-label">Day</span> 153</span>
+      <span class="reading-text">Psalms 18–20</span>
+    </li><li class="reading-row" id="day-154" data-search="psalms 21–23 154">
+      <span class="day-number"><span class="day-label">Day</span> 154</span>
+      <span class="reading-text">Psalms 21–23</span>
+    </li><li class="reading-row" id="day-155" data-search="psalms 24–26 155">
+      <span class="day-number"><span class="day-label">Day</span> 155</span>
+      <span class="reading-text">Psalms 24–26</span>
+    </li><li class="reading-row" id="day-156" data-search="psalms 27–30 156">
+      <span class="day-number"><span class="day-label">Day</span> 156</span>
+      <span class="reading-text">Psalms 27–30</span>
+    </li><li class="reading-row" id="day-157" data-search="psalms 31–33 157">
+      <span class="day-number"><span class="day-label">Day</span> 157</span>
+      <span class="reading-text">Psalms 31–33</span>
+    </li><li class="reading-row" id="day-158" data-search="psalms 34–36 158">
+      <span class="day-number"><span class="day-label">Day</span> 158</span>
+      <span class="reading-text">Psalms 34–36</span>
+    </li><li class="reading-row" id="day-159" data-search="psalms 37–39 159">
+      <span class="day-number"><span class="day-label">Day</span> 159</span>
+      <span class="reading-text">Psalms 37–39</span>
+    </li><li class="reading-row" id="day-160" data-search="psalms 40–43 160">
+      <span class="day-number"><span class="day-label">Day</span> 160</span>
+      <span class="reading-text">Psalms 40–43</span>
+    </li><li class="reading-row" id="day-161" data-search="psalms 44–46 161">
+      <span class="day-number"><span class="day-label">Day</span> 161</span>
+      <span class="reading-text">Psalms 44–46</span>
+    </li><li class="reading-row" id="day-162" data-search="psalms 47–49 162">
+      <span class="day-number"><span class="day-label">Day</span> 162</span>
+      <span class="reading-text">Psalms 47–49</span>
+    </li><li class="reading-row" id="day-163" data-search="psalms 50–52 163">
+      <span class="day-number"><span class="day-label">Day</span> 163</span>
+      <span class="reading-text">Psalms 50–52</span>
+    </li><li class="reading-row" id="day-164" data-search="psalms 53–56 164">
+      <span class="day-number"><span class="day-label">Day</span> 164</span>
+      <span class="reading-text">Psalms 53–56</span>
+    </li><li class="reading-row" id="day-165" data-search="psalms 57–59 165">
+      <span class="day-number"><span class="day-label">Day</span> 165</span>
+      <span class="reading-text">Psalms 57–59</span>
+    </li><li class="reading-row" id="day-166" data-search="psalms 60–62 166">
+      <span class="day-number"><span class="day-label">Day</span> 166</span>
+      <span class="reading-text">Psalms 60–62</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-167" data-search="psalms 63–66 167">
+      <span class="day-number"><span class="day-label">Day</span> 167</span>
+      <span class="reading-text">Psalms 63–66</span>
+    </li><li class="reading-row" id="day-168" data-search="psalms 67–69 168">
+      <span class="day-number"><span class="day-label">Day</span> 168</span>
+      <span class="reading-text">Psalms 67–69</span>
+    </li><li class="reading-row" id="day-169" data-search="psalms 70–72 169">
+      <span class="day-number"><span class="day-label">Day</span> 169</span>
+      <span class="reading-text">Psalms 70–72</span>
+    </li><li class="reading-row" id="day-170" data-search="psalms 73–75 170">
+      <span class="day-number"><span class="day-label">Day</span> 170</span>
+      <span class="reading-text">Psalms 73–75</span>
+    </li><li class="reading-row" id="day-171" data-search="psalms 76–79 171">
+      <span class="day-number"><span class="day-label">Day</span> 171</span>
+      <span class="reading-text">Psalms 76–79</span>
+    </li><li class="reading-row" id="day-172" data-search="psalms 80–82 172">
+      <span class="day-number"><span class="day-label">Day</span> 172</span>
+      <span class="reading-text">Psalms 80–82</span>
+    </li><li class="reading-row" id="day-173" data-search="psalms 83–85 173">
+      <span class="day-number"><span class="day-label">Day</span> 173</span>
+      <span class="reading-text">Psalms 83–85</span>
+    </li><li class="reading-row" id="day-174" data-search="psalms 86–88 174">
+      <span class="day-number"><span class="day-label">Day</span> 174</span>
+      <span class="reading-text">Psalms 86–88</span>
+    </li><li class="reading-row" id="day-175" data-search="psalms 89–92 175">
+      <span class="day-number"><span class="day-label">Day</span> 175</span>
+      <span class="reading-text">Psalms 89–92</span>
+    </li><li class="reading-row" id="day-176" data-search="psalms 93–95 176">
+      <span class="day-number"><span class="day-label">Day</span> 176</span>
+      <span class="reading-text">Psalms 93–95</span>
+    </li><li class="reading-row" id="day-177" data-search="psalms 96–98 177">
+      <span class="day-number"><span class="day-label">Day</span> 177</span>
+      <span class="reading-text">Psalms 96–98</span>
+    </li><li class="reading-row" id="day-178" data-search="psalms 99–101 178">
+      <span class="day-number"><span class="day-label">Day</span> 178</span>
+      <span class="reading-text">Psalms 99–101</span>
+    </li><li class="reading-row" id="day-179" data-search="psalms 102–105 179">
+      <span class="day-number"><span class="day-label">Day</span> 179</span>
+      <span class="reading-text">Psalms 102–105</span>
+    </li><li class="reading-row" id="day-180" data-search="psalms 106–108 180">
+      <span class="day-number"><span class="day-label">Day</span> 180</span>
+      <span class="reading-text">Psalms 106–108</span>
+    </li><li class="reading-row" id="day-181" data-search="psalms 109–111 181">
+      <span class="day-number"><span class="day-label">Day</span> 181</span>
+      <span class="reading-text">Psalms 109–111</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-7" data-part="7">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 07</p>
+      <h2>Days 182–212</h2>
+    </div>
+    <p class="book-span">Psalms → Isaiah</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-182" data-search="psalms 112–114 182">
+      <span class="day-number"><span class="day-label">Day</span> 182</span>
+      <span class="reading-text">Psalms 112–114</span>
+    </li><li class="reading-row" id="day-183" data-search="psalms 115–118 183">
+      <span class="day-number"><span class="day-label">Day</span> 183</span>
+      <span class="reading-text">Psalms 115–118</span>
+    </li><li class="reading-row" id="day-184" data-search="psalms 119–121 184">
+      <span class="day-number"><span class="day-label">Day</span> 184</span>
+      <span class="reading-text">Psalms 119–121</span>
+    </li><li class="reading-row" id="day-185" data-search="psalms 122–124 185">
+      <span class="day-number"><span class="day-label">Day</span> 185</span>
+      <span class="reading-text">Psalms 122–124</span>
+    </li><li class="reading-row" id="day-186" data-search="psalms 125–127 186">
+      <span class="day-number"><span class="day-label">Day</span> 186</span>
+      <span class="reading-text">Psalms 125–127</span>
+    </li><li class="reading-row" id="day-187" data-search="psalms 128–131 187">
+      <span class="day-number"><span class="day-label">Day</span> 187</span>
+      <span class="reading-text">Psalms 128–131</span>
+    </li><li class="reading-row" id="day-188" data-search="psalms 132–134 188">
+      <span class="day-number"><span class="day-label">Day</span> 188</span>
+      <span class="reading-text">Psalms 132–134</span>
+    </li><li class="reading-row" id="day-189" data-search="psalms 135–137 189">
+      <span class="day-number"><span class="day-label">Day</span> 189</span>
+      <span class="reading-text">Psalms 135–137</span>
+    </li><li class="reading-row" id="day-190" data-search="psalms 138–140 190">
+      <span class="day-number"><span class="day-label">Day</span> 190</span>
+      <span class="reading-text">Psalms 138–140</span>
+    </li><li class="reading-row" id="day-191" data-search="psalms 141–144 191">
+      <span class="day-number"><span class="day-label">Day</span> 191</span>
+      <span class="reading-text">Psalms 141–144</span>
+    </li><li class="reading-row" id="day-192" data-search="psalms 145–147 192">
+      <span class="day-number"><span class="day-label">Day</span> 192</span>
+      <span class="reading-text">Psalms 145–147</span>
+    </li><li class="reading-row" id="day-193" data-search="psalms 148–150 193">
+      <span class="day-number"><span class="day-label">Day</span> 193</span>
+      <span class="reading-text">Psalms 148–150</span>
+    </li><li class="reading-row" id="day-194" data-search="proverbs 1–3 194">
+      <span class="day-number"><span class="day-label">Day</span> 194</span>
+      <span class="reading-text">Proverbs 1–3</span>
+    </li><li class="reading-row" id="day-195" data-search="proverbs 4–7 195">
+      <span class="day-number"><span class="day-label">Day</span> 195</span>
+      <span class="reading-text">Proverbs 4–7</span>
+    </li><li class="reading-row" id="day-196" data-search="proverbs 8–10 196">
+      <span class="day-number"><span class="day-label">Day</span> 196</span>
+      <span class="reading-text">Proverbs 8–10</span>
+    </li><li class="reading-row" id="day-197" data-search="proverbs 11–13 197">
+      <span class="day-number"><span class="day-label">Day</span> 197</span>
+      <span class="reading-text">Proverbs 11–13</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-198" data-search="proverbs 14–16 198">
+      <span class="day-number"><span class="day-label">Day</span> 198</span>
+      <span class="reading-text">Proverbs 14–16</span>
+    </li><li class="reading-row" id="day-199" data-search="proverbs 17–20 199">
+      <span class="day-number"><span class="day-label">Day</span> 199</span>
+      <span class="reading-text">Proverbs 17–20</span>
+    </li><li class="reading-row" id="day-200" data-search="proverbs 21–23 200">
+      <span class="day-number"><span class="day-label">Day</span> 200</span>
+      <span class="reading-text">Proverbs 21–23</span>
+    </li><li class="reading-row" id="day-201" data-search="proverbs 24–26 201">
+      <span class="day-number"><span class="day-label">Day</span> 201</span>
+      <span class="reading-text">Proverbs 24–26</span>
+    </li><li class="reading-row" id="day-202" data-search="proverbs 27–30 202">
+      <span class="day-number"><span class="day-label">Day</span> 202</span>
+      <span class="reading-text">Proverbs 27–30</span>
+    </li><li class="reading-row" id="day-203" data-search="proverbs 31 · ecclesiastes 1–2 203">
+      <span class="day-number"><span class="day-label">Day</span> 203</span>
+      <span class="reading-text">Proverbs 31 · Ecclesiastes 1–2</span>
+    </li><li class="reading-row" id="day-204" data-search="ecclesiastes 3–5 204">
+      <span class="day-number"><span class="day-label">Day</span> 204</span>
+      <span class="reading-text">Ecclesiastes 3–5</span>
+    </li><li class="reading-row" id="day-205" data-search="ecclesiastes 6–8 205">
+      <span class="day-number"><span class="day-label">Day</span> 205</span>
+      <span class="reading-text">Ecclesiastes 6–8</span>
+    </li><li class="reading-row" id="day-206" data-search="ecclesiastes 9–12 206">
+      <span class="day-number"><span class="day-label">Day</span> 206</span>
+      <span class="reading-text">Ecclesiastes 9–12</span>
+    </li><li class="reading-row" id="day-207" data-search="song of solomon 1–3 207">
+      <span class="day-number"><span class="day-label">Day</span> 207</span>
+      <span class="reading-text">Song of Solomon 1–3</span>
+    </li><li class="reading-row" id="day-208" data-search="song of solomon 4–6 208">
+      <span class="day-number"><span class="day-label">Day</span> 208</span>
+      <span class="reading-text">Song of Solomon 4–6</span>
+    </li><li class="reading-row" id="day-209" data-search="song of solomon 7–8 · isaiah 1 209">
+      <span class="day-number"><span class="day-label">Day</span> 209</span>
+      <span class="reading-text">Song of Solomon 7–8 · Isaiah 1</span>
+    </li><li class="reading-row" id="day-210" data-search="isaiah 2–5 210">
+      <span class="day-number"><span class="day-label">Day</span> 210</span>
+      <span class="reading-text">Isaiah 2–5</span>
+    </li><li class="reading-row" id="day-211" data-search="isaiah 6–8 211">
+      <span class="day-number"><span class="day-label">Day</span> 211</span>
+      <span class="reading-text">Isaiah 6–8</span>
+    </li><li class="reading-row" id="day-212" data-search="isaiah 9–11 212">
+      <span class="day-number"><span class="day-label">Day</span> 212</span>
+      <span class="reading-text">Isaiah 9–11</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-8" data-part="8">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 08</p>
+      <h2>Days 213–243</h2>
+    </div>
+    <p class="book-span">Isaiah → Jeremiah</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-213" data-search="isaiah 12–14 213">
+      <span class="day-number"><span class="day-label">Day</span> 213</span>
+      <span class="reading-text">Isaiah 12–14</span>
+    </li><li class="reading-row" id="day-214" data-search="isaiah 15–18 214">
+      <span class="day-number"><span class="day-label">Day</span> 214</span>
+      <span class="reading-text">Isaiah 15–18</span>
+    </li><li class="reading-row" id="day-215" data-search="isaiah 19–21 215">
+      <span class="day-number"><span class="day-label">Day</span> 215</span>
+      <span class="reading-text">Isaiah 19–21</span>
+    </li><li class="reading-row" id="day-216" data-search="isaiah 22–24 216">
+      <span class="day-number"><span class="day-label">Day</span> 216</span>
+      <span class="reading-text">Isaiah 22–24</span>
+    </li><li class="reading-row" id="day-217" data-search="isaiah 25–27 217">
+      <span class="day-number"><span class="day-label">Day</span> 217</span>
+      <span class="reading-text">Isaiah 25–27</span>
+    </li><li class="reading-row" id="day-218" data-search="isaiah 28–31 218">
+      <span class="day-number"><span class="day-label">Day</span> 218</span>
+      <span class="reading-text">Isaiah 28–31</span>
+    </li><li class="reading-row" id="day-219" data-search="isaiah 32–34 219">
+      <span class="day-number"><span class="day-label">Day</span> 219</span>
+      <span class="reading-text">Isaiah 32–34</span>
+    </li><li class="reading-row" id="day-220" data-search="isaiah 35–37 220">
+      <span class="day-number"><span class="day-label">Day</span> 220</span>
+      <span class="reading-text">Isaiah 35–37</span>
+    </li><li class="reading-row" id="day-221" data-search="isaiah 38–40 221">
+      <span class="day-number"><span class="day-label">Day</span> 221</span>
+      <span class="reading-text">Isaiah 38–40</span>
+    </li><li class="reading-row" id="day-222" data-search="isaiah 41–44 222">
+      <span class="day-number"><span class="day-label">Day</span> 222</span>
+      <span class="reading-text">Isaiah 41–44</span>
+    </li><li class="reading-row" id="day-223" data-search="isaiah 45–47 223">
+      <span class="day-number"><span class="day-label">Day</span> 223</span>
+      <span class="reading-text">Isaiah 45–47</span>
+    </li><li class="reading-row" id="day-224" data-search="isaiah 48–50 224">
+      <span class="day-number"><span class="day-label">Day</span> 224</span>
+      <span class="reading-text">Isaiah 48–50</span>
+    </li><li class="reading-row" id="day-225" data-search="isaiah 51–53 225">
+      <span class="day-number"><span class="day-label">Day</span> 225</span>
+      <span class="reading-text">Isaiah 51–53</span>
+    </li><li class="reading-row" id="day-226" data-search="isaiah 54–57 226">
+      <span class="day-number"><span class="day-label">Day</span> 226</span>
+      <span class="reading-text">Isaiah 54–57</span>
+    </li><li class="reading-row" id="day-227" data-search="isaiah 58–60 227">
+      <span class="day-number"><span class="day-label">Day</span> 227</span>
+      <span class="reading-text">Isaiah 58–60</span>
+    </li><li class="reading-row" id="day-228" data-search="isaiah 61–63 228">
+      <span class="day-number"><span class="day-label">Day</span> 228</span>
+      <span class="reading-text">Isaiah 61–63</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-229" data-search="isaiah 64–66 229">
+      <span class="day-number"><span class="day-label">Day</span> 229</span>
+      <span class="reading-text">Isaiah 64–66</span>
+    </li><li class="reading-row" id="day-230" data-search="jeremiah 1–4 230">
+      <span class="day-number"><span class="day-label">Day</span> 230</span>
+      <span class="reading-text">Jeremiah 1–4</span>
+    </li><li class="reading-row" id="day-231" data-search="jeremiah 5–7 231">
+      <span class="day-number"><span class="day-label">Day</span> 231</span>
+      <span class="reading-text">Jeremiah 5–7</span>
+    </li><li class="reading-row" id="day-232" data-search="jeremiah 8–10 232">
+      <span class="day-number"><span class="day-label">Day</span> 232</span>
+      <span class="reading-text">Jeremiah 8–10</span>
+    </li><li class="reading-row" id="day-233" data-search="jeremiah 11–14 233">
+      <span class="day-number"><span class="day-label">Day</span> 233</span>
+      <span class="reading-text">Jeremiah 11–14</span>
+    </li><li class="reading-row" id="day-234" data-search="jeremiah 15–17 234">
+      <span class="day-number"><span class="day-label">Day</span> 234</span>
+      <span class="reading-text">Jeremiah 15–17</span>
+    </li><li class="reading-row" id="day-235" data-search="jeremiah 18–20 235">
+      <span class="day-number"><span class="day-label">Day</span> 235</span>
+      <span class="reading-text">Jeremiah 18–20</span>
+    </li><li class="reading-row" id="day-236" data-search="jeremiah 21–23 236">
+      <span class="day-number"><span class="day-label">Day</span> 236</span>
+      <span class="reading-text">Jeremiah 21–23</span>
+    </li><li class="reading-row" id="day-237" data-search="jeremiah 24–27 237">
+      <span class="day-number"><span class="day-label">Day</span> 237</span>
+      <span class="reading-text">Jeremiah 24–27</span>
+    </li><li class="reading-row" id="day-238" data-search="jeremiah 28–30 238">
+      <span class="day-number"><span class="day-label">Day</span> 238</span>
+      <span class="reading-text">Jeremiah 28–30</span>
+    </li><li class="reading-row" id="day-239" data-search="jeremiah 31–33 239">
+      <span class="day-number"><span class="day-label">Day</span> 239</span>
+      <span class="reading-text">Jeremiah 31–33</span>
+    </li><li class="reading-row" id="day-240" data-search="jeremiah 34–36 240">
+      <span class="day-number"><span class="day-label">Day</span> 240</span>
+      <span class="reading-text">Jeremiah 34–36</span>
+    </li><li class="reading-row" id="day-241" data-search="jeremiah 37–40 241">
+      <span class="day-number"><span class="day-label">Day</span> 241</span>
+      <span class="reading-text">Jeremiah 37–40</span>
+    </li><li class="reading-row" id="day-242" data-search="jeremiah 41–43 242">
+      <span class="day-number"><span class="day-label">Day</span> 242</span>
+      <span class="reading-text">Jeremiah 41–43</span>
+    </li><li class="reading-row" id="day-243" data-search="jeremiah 44–46 243">
+      <span class="day-number"><span class="day-label">Day</span> 243</span>
+      <span class="reading-text">Jeremiah 44–46</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-9" data-part="9">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 09</p>
+      <h2>Days 244–273</h2>
+    </div>
+    <p class="book-span">Jeremiah → Obadiah</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-244" data-search="jeremiah 47–49 244">
+      <span class="day-number"><span class="day-label">Day</span> 244</span>
+      <span class="reading-text">Jeremiah 47–49</span>
+    </li><li class="reading-row" id="day-245" data-search="jeremiah 50–52 · lamentations 1 245">
+      <span class="day-number"><span class="day-label">Day</span> 245</span>
+      <span class="reading-text">Jeremiah 50–52 · Lamentations 1</span>
+    </li><li class="reading-row" id="day-246" data-search="lamentations 2–4 246">
+      <span class="day-number"><span class="day-label">Day</span> 246</span>
+      <span class="reading-text">Lamentations 2–4</span>
+    </li><li class="reading-row" id="day-247" data-search="lamentations 5 · ezekiel 1–2 247">
+      <span class="day-number"><span class="day-label">Day</span> 247</span>
+      <span class="reading-text">Lamentations 5 · Ezekiel 1–2</span>
+    </li><li class="reading-row" id="day-248" data-search="ezekiel 3–5 248">
+      <span class="day-number"><span class="day-label">Day</span> 248</span>
+      <span class="reading-text">Ezekiel 3–5</span>
+    </li><li class="reading-row" id="day-249" data-search="ezekiel 6–9 249">
+      <span class="day-number"><span class="day-label">Day</span> 249</span>
+      <span class="reading-text">Ezekiel 6–9</span>
+    </li><li class="reading-row" id="day-250" data-search="ezekiel 10–12 250">
+      <span class="day-number"><span class="day-label">Day</span> 250</span>
+      <span class="reading-text">Ezekiel 10–12</span>
+    </li><li class="reading-row" id="day-251" data-search="ezekiel 13–15 251">
+      <span class="day-number"><span class="day-label">Day</span> 251</span>
+      <span class="reading-text">Ezekiel 13–15</span>
+    </li><li class="reading-row" id="day-252" data-search="ezekiel 16–18 252">
+      <span class="day-number"><span class="day-label">Day</span> 252</span>
+      <span class="reading-text">Ezekiel 16–18</span>
+    </li><li class="reading-row" id="day-253" data-search="ezekiel 19–22 253">
+      <span class="day-number"><span class="day-label">Day</span> 253</span>
+      <span class="reading-text">Ezekiel 19–22</span>
+    </li><li class="reading-row" id="day-254" data-search="ezekiel 23–25 254">
+      <span class="day-number"><span class="day-label">Day</span> 254</span>
+      <span class="reading-text">Ezekiel 23–25</span>
+    </li><li class="reading-row" id="day-255" data-search="ezekiel 26–28 255">
+      <span class="day-number"><span class="day-label">Day</span> 255</span>
+      <span class="reading-text">Ezekiel 26–28</span>
+    </li><li class="reading-row" id="day-256" data-search="ezekiel 29–31 256">
+      <span class="day-number"><span class="day-label">Day</span> 256</span>
+      <span class="reading-text">Ezekiel 29–31</span>
+    </li><li class="reading-row" id="day-257" data-search="ezekiel 32–35 257">
+      <span class="day-number"><span class="day-label">Day</span> 257</span>
+      <span class="reading-text">Ezekiel 32–35</span>
+    </li><li class="reading-row" id="day-258" data-search="ezekiel 36–38 258">
+      <span class="day-number"><span class="day-label">Day</span> 258</span>
+      <span class="reading-text">Ezekiel 36–38</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-259" data-search="ezekiel 39–41 259">
+      <span class="day-number"><span class="day-label">Day</span> 259</span>
+      <span class="reading-text">Ezekiel 39–41</span>
+    </li><li class="reading-row" id="day-260" data-search="ezekiel 42–44 260">
+      <span class="day-number"><span class="day-label">Day</span> 260</span>
+      <span class="reading-text">Ezekiel 42–44</span>
+    </li><li class="reading-row" id="day-261" data-search="ezekiel 45–48 261">
+      <span class="day-number"><span class="day-label">Day</span> 261</span>
+      <span class="reading-text">Ezekiel 45–48</span>
+    </li><li class="reading-row" id="day-262" data-search="daniel 1–3 262">
+      <span class="day-number"><span class="day-label">Day</span> 262</span>
+      <span class="reading-text">Daniel 1–3</span>
+    </li><li class="reading-row" id="day-263" data-search="daniel 4–6 263">
+      <span class="day-number"><span class="day-label">Day</span> 263</span>
+      <span class="reading-text">Daniel 4–6</span>
+    </li><li class="reading-row" id="day-264" data-search="daniel 7–9 264">
+      <span class="day-number"><span class="day-label">Day</span> 264</span>
+      <span class="reading-text">Daniel 7–9</span>
+    </li><li class="reading-row" id="day-265" data-search="daniel 10–12 · hosea 1 265">
+      <span class="day-number"><span class="day-label">Day</span> 265</span>
+      <span class="reading-text">Daniel 10–12 · Hosea 1</span>
+    </li><li class="reading-row" id="day-266" data-search="hosea 2–4 266">
+      <span class="day-number"><span class="day-label">Day</span> 266</span>
+      <span class="reading-text">Hosea 2–4</span>
+    </li><li class="reading-row" id="day-267" data-search="hosea 5–7 267">
+      <span class="day-number"><span class="day-label">Day</span> 267</span>
+      <span class="reading-text">Hosea 5–7</span>
+    </li><li class="reading-row" id="day-268" data-search="hosea 8–11 268">
+      <span class="day-number"><span class="day-label">Day</span> 268</span>
+      <span class="reading-text">Hosea 8–11</span>
+    </li><li class="reading-row" id="day-269" data-search="hosea 12–14 269">
+      <span class="day-number"><span class="day-label">Day</span> 269</span>
+      <span class="reading-text">Hosea 12–14</span>
+    </li><li class="reading-row" id="day-270" data-search="joel 1–3 270">
+      <span class="day-number"><span class="day-label">Day</span> 270</span>
+      <span class="reading-text">Joel 1–3</span>
+    </li><li class="reading-row" id="day-271" data-search="amos 1–3 271">
+      <span class="day-number"><span class="day-label">Day</span> 271</span>
+      <span class="reading-text">Amos 1–3</span>
+    </li><li class="reading-row" id="day-272" data-search="amos 4–7 272">
+      <span class="day-number"><span class="day-label">Day</span> 272</span>
+      <span class="reading-text">Amos 4–7</span>
+    </li><li class="reading-row" id="day-273" data-search="amos 8–9 · obadiah 1 273">
+      <span class="day-number"><span class="day-label">Day</span> 273</span>
+      <span class="reading-text">Amos 8–9 · Obadiah 1</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-10" data-part="10">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 10</p>
+      <h2>Days 274–304</h2>
+    </div>
+    <p class="book-span">Jonah → Luke</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-274" data-search="jonah 1–3 274">
+      <span class="day-number"><span class="day-label">Day</span> 274</span>
+      <span class="reading-text">Jonah 1–3</span>
+    </li><li class="reading-row" id="day-275" data-search="jonah 4 · micah 1–2 275">
+      <span class="day-number"><span class="day-label">Day</span> 275</span>
+      <span class="reading-text">Jonah 4 · Micah 1–2</span>
+    </li><li class="reading-row" id="day-276" data-search="micah 3–6 276">
+      <span class="day-number"><span class="day-label">Day</span> 276</span>
+      <span class="reading-text">Micah 3–6</span>
+    </li><li class="reading-row" id="day-277" data-search="micah 7 · nahum 1–2 277">
+      <span class="day-number"><span class="day-label">Day</span> 277</span>
+      <span class="reading-text">Micah 7 · Nahum 1–2</span>
+    </li><li class="reading-row" id="day-278" data-search="nahum 3 · habakkuk 1–2 278">
+      <span class="day-number"><span class="day-label">Day</span> 278</span>
+      <span class="reading-text">Nahum 3 · Habakkuk 1–2</span>
+    </li><li class="reading-row" id="day-279" data-search="habakkuk 3 · zephaniah 1–2 279">
+      <span class="day-number"><span class="day-label">Day</span> 279</span>
+      <span class="reading-text">Habakkuk 3 · Zephaniah 1–2</span>
+    </li><li class="reading-row" id="day-280" data-search="zephaniah 3 · haggai 1–2 · zechariah 1 280">
+      <span class="day-number"><span class="day-label">Day</span> 280</span>
+      <span class="reading-text">Zephaniah 3 · Haggai 1–2 · Zechariah 1</span>
+    </li><li class="reading-row" id="day-281" data-search="zechariah 2–4 281">
+      <span class="day-number"><span class="day-label">Day</span> 281</span>
+      <span class="reading-text">Zechariah 2–4</span>
+    </li><li class="reading-row" id="day-282" data-search="zechariah 5–7 282">
+      <span class="day-number"><span class="day-label">Day</span> 282</span>
+      <span class="reading-text">Zechariah 5–7</span>
+    </li><li class="reading-row" id="day-283" data-search="zechariah 8–10 283">
+      <span class="day-number"><span class="day-label">Day</span> 283</span>
+      <span class="reading-text">Zechariah 8–10</span>
+    </li><li class="reading-row" id="day-284" data-search="zechariah 11–14 284">
+      <span class="day-number"><span class="day-label">Day</span> 284</span>
+      <span class="reading-text">Zechariah 11–14</span>
+    </li><li class="reading-row" id="day-285" data-search="malachi 1–3 285">
+      <span class="day-number"><span class="day-label">Day</span> 285</span>
+      <span class="reading-text">Malachi 1–3</span>
+    </li><li class="reading-row" id="day-286" data-search="malachi 4 · matthew 1–2 286">
+      <span class="day-number"><span class="day-label">Day</span> 286</span>
+      <span class="reading-text">Malachi 4 · Matthew 1–2</span>
+    </li><li class="reading-row" id="day-287" data-search="matthew 3–5 287">
+      <span class="day-number"><span class="day-label">Day</span> 287</span>
+      <span class="reading-text">Matthew 3–5</span>
+    </li><li class="reading-row" id="day-288" data-search="matthew 6–9 288">
+      <span class="day-number"><span class="day-label">Day</span> 288</span>
+      <span class="reading-text">Matthew 6–9</span>
+    </li><li class="reading-row" id="day-289" data-search="matthew 10–12 289">
+      <span class="day-number"><span class="day-label">Day</span> 289</span>
+      <span class="reading-text">Matthew 10–12</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-290" data-search="matthew 13–15 290">
+      <span class="day-number"><span class="day-label">Day</span> 290</span>
+      <span class="reading-text">Matthew 13–15</span>
+    </li><li class="reading-row" id="day-291" data-search="matthew 16–18 291">
+      <span class="day-number"><span class="day-label">Day</span> 291</span>
+      <span class="reading-text">Matthew 16–18</span>
+    </li><li class="reading-row" id="day-292" data-search="matthew 19–22 292">
+      <span class="day-number"><span class="day-label">Day</span> 292</span>
+      <span class="reading-text">Matthew 19–22</span>
+    </li><li class="reading-row" id="day-293" data-search="matthew 23–25 293">
+      <span class="day-number"><span class="day-label">Day</span> 293</span>
+      <span class="reading-text">Matthew 23–25</span>
+    </li><li class="reading-row" id="day-294" data-search="matthew 26–28 294">
+      <span class="day-number"><span class="day-label">Day</span> 294</span>
+      <span class="reading-text">Matthew 26–28</span>
+    </li><li class="reading-row" id="day-295" data-search="mark 1–3 295">
+      <span class="day-number"><span class="day-label">Day</span> 295</span>
+      <span class="reading-text">Mark 1–3</span>
+    </li><li class="reading-row" id="day-296" data-search="mark 4–7 296">
+      <span class="day-number"><span class="day-label">Day</span> 296</span>
+      <span class="reading-text">Mark 4–7</span>
+    </li><li class="reading-row" id="day-297" data-search="mark 8–10 297">
+      <span class="day-number"><span class="day-label">Day</span> 297</span>
+      <span class="reading-text">Mark 8–10</span>
+    </li><li class="reading-row" id="day-298" data-search="mark 11–13 298">
+      <span class="day-number"><span class="day-label">Day</span> 298</span>
+      <span class="reading-text">Mark 11–13</span>
+    </li><li class="reading-row" id="day-299" data-search="mark 14–16 · luke 1 299">
+      <span class="day-number"><span class="day-label">Day</span> 299</span>
+      <span class="reading-text">Mark 14–16 · Luke 1</span>
+    </li><li class="reading-row" id="day-300" data-search="luke 2–4 300">
+      <span class="day-number"><span class="day-label">Day</span> 300</span>
+      <span class="reading-text">Luke 2–4</span>
+    </li><li class="reading-row" id="day-301" data-search="luke 5–7 301">
+      <span class="day-number"><span class="day-label">Day</span> 301</span>
+      <span class="reading-text">Luke 5–7</span>
+    </li><li class="reading-row" id="day-302" data-search="luke 8–10 302">
+      <span class="day-number"><span class="day-label">Day</span> 302</span>
+      <span class="reading-text">Luke 8–10</span>
+    </li><li class="reading-row" id="day-303" data-search="luke 11–14 303">
+      <span class="day-number"><span class="day-label">Day</span> 303</span>
+      <span class="reading-text">Luke 11–14</span>
+    </li><li class="reading-row" id="day-304" data-search="luke 15–17 304">
+      <span class="day-number"><span class="day-label">Day</span> 304</span>
+      <span class="reading-text">Luke 15–17</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-11" data-part="11">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 11</p>
+      <h2>Days 305–334</h2>
+    </div>
+    <p class="book-span">Luke → 2 Corinthians</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-305" data-search="luke 18–20 305">
+      <span class="day-number"><span class="day-label">Day</span> 305</span>
+      <span class="reading-text">Luke 18–20</span>
+    </li><li class="reading-row" id="day-306" data-search="luke 21–23 306">
+      <span class="day-number"><span class="day-label">Day</span> 306</span>
+      <span class="reading-text">Luke 21–23</span>
+    </li><li class="reading-row" id="day-307" data-search="luke 24 · john 1–3 307">
+      <span class="day-number"><span class="day-label">Day</span> 307</span>
+      <span class="reading-text">Luke 24 · John 1–3</span>
+    </li><li class="reading-row" id="day-308" data-search="john 4–6 308">
+      <span class="day-number"><span class="day-label">Day</span> 308</span>
+      <span class="reading-text">John 4–6</span>
+    </li><li class="reading-row" id="day-309" data-search="john 7–9 309">
+      <span class="day-number"><span class="day-label">Day</span> 309</span>
+      <span class="reading-text">John 7–9</span>
+    </li><li class="reading-row" id="day-310" data-search="john 10–12 310">
+      <span class="day-number"><span class="day-label">Day</span> 310</span>
+      <span class="reading-text">John 10–12</span>
+    </li><li class="reading-row" id="day-311" data-search="john 13–16 311">
+      <span class="day-number"><span class="day-label">Day</span> 311</span>
+      <span class="reading-text">John 13–16</span>
+    </li><li class="reading-row" id="day-312" data-search="john 17–19 312">
+      <span class="day-number"><span class="day-label">Day</span> 312</span>
+      <span class="reading-text">John 17–19</span>
+    </li><li class="reading-row" id="day-313" data-search="john 20–21 · acts 1 313">
+      <span class="day-number"><span class="day-label">Day</span> 313</span>
+      <span class="reading-text">John 20–21 · Acts 1</span>
+    </li><li class="reading-row" id="day-314" data-search="acts 2–4 314">
+      <span class="day-number"><span class="day-label">Day</span> 314</span>
+      <span class="reading-text">Acts 2–4</span>
+    </li><li class="reading-row" id="day-315" data-search="acts 5–8 315">
+      <span class="day-number"><span class="day-label">Day</span> 315</span>
+      <span class="reading-text">Acts 5–8</span>
+    </li><li class="reading-row" id="day-316" data-search="acts 9–11 316">
+      <span class="day-number"><span class="day-label">Day</span> 316</span>
+      <span class="reading-text">Acts 9–11</span>
+    </li><li class="reading-row" id="day-317" data-search="acts 12–14 317">
+      <span class="day-number"><span class="day-label">Day</span> 317</span>
+      <span class="reading-text">Acts 12–14</span>
+    </li><li class="reading-row" id="day-318" data-search="acts 15–17 318">
+      <span class="day-number"><span class="day-label">Day</span> 318</span>
+      <span class="reading-text">Acts 15–17</span>
+    </li><li class="reading-row" id="day-319" data-search="acts 18–21 319">
+      <span class="day-number"><span class="day-label">Day</span> 319</span>
+      <span class="reading-text">Acts 18–21</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-320" data-search="acts 22–24 320">
+      <span class="day-number"><span class="day-label">Day</span> 320</span>
+      <span class="reading-text">Acts 22–24</span>
+    </li><li class="reading-row" id="day-321" data-search="acts 25–27 321">
+      <span class="day-number"><span class="day-label">Day</span> 321</span>
+      <span class="reading-text">Acts 25–27</span>
+    </li><li class="reading-row" id="day-322" data-search="acts 28 · romans 1–2 322">
+      <span class="day-number"><span class="day-label">Day</span> 322</span>
+      <span class="reading-text">Acts 28 · Romans 1–2</span>
+    </li><li class="reading-row" id="day-323" data-search="romans 3–6 323">
+      <span class="day-number"><span class="day-label">Day</span> 323</span>
+      <span class="reading-text">Romans 3–6</span>
+    </li><li class="reading-row" id="day-324" data-search="romans 7–9 324">
+      <span class="day-number"><span class="day-label">Day</span> 324</span>
+      <span class="reading-text">Romans 7–9</span>
+    </li><li class="reading-row" id="day-325" data-search="romans 10–12 325">
+      <span class="day-number"><span class="day-label">Day</span> 325</span>
+      <span class="reading-text">Romans 10–12</span>
+    </li><li class="reading-row" id="day-326" data-search="romans 13–15 326">
+      <span class="day-number"><span class="day-label">Day</span> 326</span>
+      <span class="reading-text">Romans 13–15</span>
+    </li><li class="reading-row" id="day-327" data-search="romans 16 · 1 corinthians 1–3 327">
+      <span class="day-number"><span class="day-label">Day</span> 327</span>
+      <span class="reading-text">Romans 16 · 1 Corinthians 1–3</span>
+    </li><li class="reading-row" id="day-328" data-search="1 corinthians 4–6 328">
+      <span class="day-number"><span class="day-label">Day</span> 328</span>
+      <span class="reading-text">1 Corinthians 4–6</span>
+    </li><li class="reading-row" id="day-329" data-search="1 corinthians 7–9 329">
+      <span class="day-number"><span class="day-label">Day</span> 329</span>
+      <span class="reading-text">1 Corinthians 7–9</span>
+    </li><li class="reading-row" id="day-330" data-search="1 corinthians 10–12 330">
+      <span class="day-number"><span class="day-label">Day</span> 330</span>
+      <span class="reading-text">1 Corinthians 10–12</span>
+    </li><li class="reading-row" id="day-331" data-search="1 corinthians 13–16 331">
+      <span class="day-number"><span class="day-label">Day</span> 331</span>
+      <span class="reading-text">1 Corinthians 13–16</span>
+    </li><li class="reading-row" id="day-332" data-search="2 corinthians 1–3 332">
+      <span class="day-number"><span class="day-label">Day</span> 332</span>
+      <span class="reading-text">2 Corinthians 1–3</span>
+    </li><li class="reading-row" id="day-333" data-search="2 corinthians 4–6 333">
+      <span class="day-number"><span class="day-label">Day</span> 333</span>
+      <span class="reading-text">2 Corinthians 4–6</span>
+    </li><li class="reading-row" id="day-334" data-search="2 corinthians 7–10 334">
+      <span class="day-number"><span class="day-label">Day</span> 334</span>
+      <span class="reading-text">2 Corinthians 7–10</span>
+    </li></ol>
+  </div>
+</section><section class="plan-section" id="part-12" data-part="12">
+  <header class="section-head">
+    <div>
+      <p class="section-index">Part 12</p>
+      <h2>Days 335–365</h2>
+    </div>
+    <p class="book-span">2 Corinthians → Revelation</p>
+  </header>
+  <div class="reading-columns">
+    <ol><li class="reading-row" id="day-335" data-search="2 corinthians 11–13 335">
+      <span class="day-number"><span class="day-label">Day</span> 335</span>
+      <span class="reading-text">2 Corinthians 11–13</span>
+    </li><li class="reading-row" id="day-336" data-search="galatians 1–3 336">
+      <span class="day-number"><span class="day-label">Day</span> 336</span>
+      <span class="reading-text">Galatians 1–3</span>
+    </li><li class="reading-row" id="day-337" data-search="galatians 4–6 337">
+      <span class="day-number"><span class="day-label">Day</span> 337</span>
+      <span class="reading-text">Galatians 4–6</span>
+    </li><li class="reading-row" id="day-338" data-search="ephesians 1–4 338">
+      <span class="day-number"><span class="day-label">Day</span> 338</span>
+      <span class="reading-text">Ephesians 1–4</span>
+    </li><li class="reading-row" id="day-339" data-search="ephesians 5–6 · philippians 1 339">
+      <span class="day-number"><span class="day-label">Day</span> 339</span>
+      <span class="reading-text">Ephesians 5–6 · Philippians 1</span>
+    </li><li class="reading-row" id="day-340" data-search="philippians 2–4 340">
+      <span class="day-number"><span class="day-label">Day</span> 340</span>
+      <span class="reading-text">Philippians 2–4</span>
+    </li><li class="reading-row" id="day-341" data-search="colossians 1–3 341">
+      <span class="day-number"><span class="day-label">Day</span> 341</span>
+      <span class="reading-text">Colossians 1–3</span>
+    </li><li class="reading-row" id="day-342" data-search="colossians 4 · 1 thessalonians 1–3 342">
+      <span class="day-number"><span class="day-label">Day</span> 342</span>
+      <span class="reading-text">Colossians 4 · 1 Thessalonians 1–3</span>
+    </li><li class="reading-row" id="day-343" data-search="1 thessalonians 4–5 · 2 thessalonians 1 343">
+      <span class="day-number"><span class="day-label">Day</span> 343</span>
+      <span class="reading-text">1 Thessalonians 4–5 · 2 Thessalonians 1</span>
+    </li><li class="reading-row" id="day-344" data-search="2 thessalonians 2–3 · 1 timothy 1 344">
+      <span class="day-number"><span class="day-label">Day</span> 344</span>
+      <span class="reading-text">2 Thessalonians 2–3 · 1 Timothy 1</span>
+    </li><li class="reading-row" id="day-345" data-search="1 timothy 2–4 345">
+      <span class="day-number"><span class="day-label">Day</span> 345</span>
+      <span class="reading-text">1 Timothy 2–4</span>
+    </li><li class="reading-row" id="day-346" data-search="1 timothy 5–6 · 2 timothy 1–2 346">
+      <span class="day-number"><span class="day-label">Day</span> 346</span>
+      <span class="reading-text">1 Timothy 5–6 · 2 Timothy 1–2</span>
+    </li><li class="reading-row" id="day-347" data-search="2 timothy 3–4 · titus 1 347">
+      <span class="day-number"><span class="day-label">Day</span> 347</span>
+      <span class="reading-text">2 Timothy 3–4 · Titus 1</span>
+    </li><li class="reading-row" id="day-348" data-search="titus 2–3 · philemon 1 348">
+      <span class="day-number"><span class="day-label">Day</span> 348</span>
+      <span class="reading-text">Titus 2–3 · Philemon 1</span>
+    </li><li class="reading-row" id="day-349" data-search="hebrews 1–3 349">
+      <span class="day-number"><span class="day-label">Day</span> 349</span>
+      <span class="reading-text">Hebrews 1–3</span>
+    </li><li class="reading-row" id="day-350" data-search="hebrews 4–7 350">
+      <span class="day-number"><span class="day-label">Day</span> 350</span>
+      <span class="reading-text">Hebrews 4–7</span>
+    </li></ol>
+    <ol><li class="reading-row" id="day-351" data-search="hebrews 8–10 351">
+      <span class="day-number"><span class="day-label">Day</span> 351</span>
+      <span class="reading-text">Hebrews 8–10</span>
+    </li><li class="reading-row" id="day-352" data-search="hebrews 11–13 352">
+      <span class="day-number"><span class="day-label">Day</span> 352</span>
+      <span class="reading-text">Hebrews 11–13</span>
+    </li><li class="reading-row" id="day-353" data-search="james 1–3 353">
+      <span class="day-number"><span class="day-label">Day</span> 353</span>
+      <span class="reading-text">James 1–3</span>
+    </li><li class="reading-row" id="day-354" data-search="james 4–5 · 1 peter 1–2 354">
+      <span class="day-number"><span class="day-label">Day</span> 354</span>
+      <span class="reading-text">James 4–5 · 1 Peter 1–2</span>
+    </li><li class="reading-row" id="day-355" data-search="1 peter 3–5 355">
+      <span class="day-number"><span class="day-label">Day</span> 355</span>
+      <span class="reading-text">1 Peter 3–5</span>
+    </li><li class="reading-row" id="day-356" data-search="2 peter 1–3 356">
+      <span class="day-number"><span class="day-label">Day</span> 356</span>
+      <span class="reading-text">2 Peter 1–3</span>
+    </li><li class="reading-row" id="day-357" data-search="1 john 1–3 357">
+      <span class="day-number"><span class="day-label">Day</span> 357</span>
+      <span class="reading-text">1 John 1–3</span>
+    </li><li class="reading-row" id="day-358" data-search="1 john 4–5 · 2 john 1 · 3 john 1 358">
+      <span class="day-number"><span class="day-label">Day</span> 358</span>
+      <span class="reading-text">1 John 4–5 · 2 John 1 · 3 John 1</span>
+    </li><li class="reading-row" id="day-359" data-search="jude 1 · revelation 1–2 359">
+      <span class="day-number"><span class="day-label">Day</span> 359</span>
+      <span class="reading-text">Jude 1 · Revelation 1–2</span>
+    </li><li class="reading-row" id="day-360" data-search="revelation 3–5 360">
+      <span class="day-number"><span class="day-label">Day</span> 360</span>
+      <span class="reading-text">Revelation 3–5</span>
+    </li><li class="reading-row" id="day-361" data-search="revelation 6–8 361">
+      <span class="day-number"><span class="day-label">Day</span> 361</span>
+      <span class="reading-text">Revelation 6–8</span>
+    </li><li class="reading-row" id="day-362" data-search="revelation 9–12 362">
+      <span class="day-number"><span class="day-label">Day</span> 362</span>
+      <span class="reading-text">Revelation 9–12</span>
+    </li><li class="reading-row" id="day-363" data-search="revelation 13–15 363">
+      <span class="day-number"><span class="day-label">Day</span> 363</span>
+      <span class="reading-text">Revelation 13–15</span>
+    </li><li class="reading-row" id="day-364" data-search="revelation 16–18 364">
+      <span class="day-number"><span class="day-label">Day</span> 364</span>
+      <span class="reading-text">Revelation 16–18</span>
+    </li><li class="reading-row" id="day-365" data-search="revelation 19–22 365">
+      <span class="day-number"><span class="day-label">Day</span> 365</span>
+      <span class="reading-text">Revelation 19–22</span>
+    </li></ol>
+  </div>
+</section></div>
+    <div class="empty" id="empty">No reading matches that search. Try a book name such as <strong>John</strong> or <strong>Isaiah</strong>.</div>
+
+    <p class="footer-note">The final day closes with Revelation 19–22. The schedule is date-free, so Day 1 can be any day you choose.</p>
+  </main>
+  <script>
+    (function () {
+      var jumpForm = document.getElementById('jump-form');
+      var dayInput = document.getElementById('day-input');
+      var searchInput = document.getElementById('book-search');
+      var clearButton = document.getElementById('clear-search');
+      var status = document.getElementById('status');
+      var empty = document.getElementById('empty');
+      var rows = Array.prototype.slice.call(document.querySelectorAll('.reading-row'));
+      var sections = Array.prototype.slice.call(document.querySelectorAll('.plan-section'));
+      var hitTimer;
+
+      function clearHits() {
+        rows.forEach(function (row) { row.classList.remove('is-hit'); });
+      }
+
+      jumpForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var day = parseInt(dayInput.value, 10);
+        if (!day || day < 1 || day > 365) {
+          status.textContent = 'Enter a day from 1 to 365.';
+          dayInput.focus();
+          return;
+        }
+        searchInput.value = '';
+        filterRows();
+        var target = document.getElementById('day-' + day);
+        clearHits();
+        target.classList.add('is-hit');
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        status.textContent = 'Day ' + day + ': ' + target.querySelector('.reading-text').textContent;
+        window.clearTimeout(hitTimer);
+        hitTimer = window.setTimeout(function () { target.classList.remove('is-hit'); }, 4200);
+      });
+
+      function filterRows() {
+        var query = searchInput.value.trim().toLowerCase();
+        var matches = 0;
+        clearHits();
+        rows.forEach(function (row) {
+          var show = !query || row.getAttribute('data-search').indexOf(query) !== -1;
+          row.hidden = !show;
+          if (show) matches += 1;
+        });
+        sections.forEach(function (section) {
+          section.hidden = !section.querySelector('.reading-row:not([hidden])');
+        });
+        empty.classList.toggle('show', matches === 0);
+        if (!query) {
+          status.textContent = 'Choose a part, jump to a day, or search for a book.';
+        } else if (matches === 1) {
+          status.textContent = '1 day includes “' + searchInput.value.trim() + '”.';
+        } else {
+          status.textContent = matches + ' days include “' + searchInput.value.trim() + '”.';
+        }
+      }
+
+      searchInput.addEventListener('input', filterRows);
+      clearButton.addEventListener('click', function () {
+        searchInput.value = '';
+        filterRows();
+        searchInput.focus();
+      });
+
+    })();
+  </script>
+</body>
+</html>
